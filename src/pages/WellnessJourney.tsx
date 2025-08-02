@@ -4,9 +4,42 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Leaf, Heart, Brain, Zap, Moon, Sun, Calendar, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "@/contexts/CartContext";
+import { toast } from "sonner";
 
 const WellnessJourney = () => {
   const navigate = useNavigate();
+  const { addItem } = useCart();
+
+  const handleStartProgram = (treatment: typeof treatments[0]) => {
+    addItem({
+      id: treatment.id + 1000, // Offset to avoid conflicts with products
+      name: treatment.name,
+      price: treatment.price,
+      originalPrice: "",
+      brand: "AyurvedaCareConnect",
+      image: "",
+      category: "Wellness Program",
+      type: 'program'
+    });
+    toast.success(`${treatment.name} added to cart!`);
+    navigate('/payment');
+  };
+
+  const handleBookConsultation = (consultation: typeof consultationTypes[0]) => {
+    addItem({
+      id: Math.random() * 10000, // Generate unique ID for consultations
+      name: consultation.type,
+      price: consultation.price,
+      originalPrice: "",
+      brand: "AyurvedaCareConnect",
+      image: "",
+      category: "Consultation",
+      type: 'consultation'
+    });
+    toast.success(`${consultation.type} added to cart!`);
+    navigate('/payment');
+  };
 
   const treatments = [
     {
@@ -204,7 +237,7 @@ const WellnessJourney = () => {
 
                   <div className="flex items-center justify-between">
                     <div className="text-2xl font-bold text-primary">{treatment.price}</div>
-                    <Button className="shadow-warm">
+                    <Button className="shadow-warm" onClick={() => handleStartProgram(treatment)}>
                       Start Program
                     </Button>
                   </div>
@@ -237,7 +270,7 @@ const WellnessJourney = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground mb-6">{consultation.description}</p>
-                  <Button variant="outline" className="w-full">
+                  <Button variant="outline" className="w-full" onClick={() => handleBookConsultation(consultation)}>
                     Book Consultation
                   </Button>
                 </CardContent>
@@ -257,7 +290,12 @@ const WellnessJourney = () => {
             Start with a personalized consultation to find the perfect wellness program for you
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8 py-6 shadow-warm">
+            <Button size="lg" className="text-lg px-8 py-6 shadow-warm" onClick={() => handleBookConsultation({
+              type: "Free Consultation",
+              duration: "30 minutes",
+              price: "₹0",
+              description: "Complimentary health assessment and wellness guidance"
+            })}>
               Book Free Consultation
             </Button>
             <Button variant="outline" size="lg" className="text-lg px-8 py-6" onClick={() => navigate('/marketplace')}>

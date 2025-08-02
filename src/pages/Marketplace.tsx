@@ -5,9 +5,20 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Leaf, Search, ShoppingCart, Star, Filter } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "@/contexts/CartContext";
+import { toast } from "sonner";
+
+// Import product images
+import ashwagandhaImage from "@/assets/ashwagandha-capsules.jpg";
+import triphalaImage from "@/assets/triphala-churna.jpg";
+import brahmiImage from "@/assets/brahmi-oil.jpg";
+import chyawanprashImage from "@/assets/chyawanprash.jpg";
+import turmericImage from "@/assets/turmeric-tablets.jpg";
+import arjunaImage from "@/assets/arjuna-capsules.jpg";
 
 const Marketplace = () => {
   const navigate = useNavigate();
+  const { addItem, state } = useCart();
   const [searchTerm, setSearchTerm] = useState("");
 
   const products = [
@@ -19,7 +30,7 @@ const Marketplace = () => {
       originalPrice: "₹399",
       rating: 4.5,
       reviews: 234,
-      image: "/placeholder.svg",
+      image: ashwagandhaImage,
       category: "Stress Relief",
       description: "Premium Ashwagandha extract for stress relief and energy boost",
       benefits: ["Reduces stress", "Improves energy", "Better sleep"]
@@ -32,7 +43,7 @@ const Marketplace = () => {
       originalPrice: "₹199",
       rating: 4.3,
       reviews: 156,
-      image: "/placeholder.svg",
+      image: triphalaImage,
       category: "Digestive Health",
       description: "Traditional herbal powder for digestive wellness",
       benefits: ["Improves digestion", "Detoxifies body", "Natural laxative"]
@@ -45,7 +56,7 @@ const Marketplace = () => {
       originalPrice: "₹249",
       rating: 4.7,
       reviews: 89,
-      image: "/placeholder.svg",
+      image: brahmiImage,
       category: "Mental Wellness",
       description: "Pure Brahmi oil for mental clarity and hair health",
       benefits: ["Enhances memory", "Reduces anxiety", "Healthy hair"]
@@ -58,7 +69,7 @@ const Marketplace = () => {
       originalPrice: "₹449",
       rating: 4.6,
       reviews: 312,
-      image: "/placeholder.svg",
+      image: chyawanprashImage,
       category: "Immunity",
       description: "Traditional immunity booster with 40+ herbs",
       benefits: ["Boosts immunity", "Rich in vitamin C", "Energy enhancer"]
@@ -71,7 +82,7 @@ const Marketplace = () => {
       originalPrice: "₹259",
       rating: 4.4,
       reviews: 178,
-      image: "/placeholder.svg",
+      image: turmericImage,
       category: "Anti-inflammatory",
       description: "Curcumin-rich turmeric for inflammation relief",
       benefits: ["Anti-inflammatory", "Joint health", "Antioxidant rich"]
@@ -84,7 +95,7 @@ const Marketplace = () => {
       originalPrice: "₹319",
       rating: 4.2,
       reviews: 95,
-      image: "/placeholder.svg",
+      image: arjunaImage,
       category: "Heart Health",
       description: "Arjuna extract for cardiovascular wellness",
       benefits: ["Heart health", "Blood pressure support", "Circulation"]
@@ -93,6 +104,20 @@ const Marketplace = () => {
 
   const categories = ["All", "Stress Relief", "Digestive Health", "Mental Wellness", "Immunity", "Anti-inflammatory", "Heart Health"];
   const [selectedCategory, setSelectedCategory] = useState("All");
+
+  const handleAddToCart = (product: typeof products[0]) => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      brand: product.brand,
+      image: product.image,
+      category: product.category,
+      type: 'product'
+    });
+    toast.success(`${product.name} added to cart!`);
+  };
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -112,9 +137,9 @@ const Marketplace = () => {
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <Button variant="outline" onClick={() => navigate('/')}>Back to Home</Button>
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => navigate('/cart')}>
               <ShoppingCart className="h-4 w-4 mr-2" />
-              Cart (0)
+              Cart ({state.totalItems})
             </Button>
           </nav>
         </div>
@@ -172,8 +197,12 @@ const Marketplace = () => {
             {filteredProducts.map((product) => (
               <Card key={product.id} className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-warm transition-all duration-300 hover:-translate-y-1">
                 <CardHeader>
-                  <div className="aspect-square bg-muted/30 rounded-lg mb-4 flex items-center justify-center">
-                    <Leaf className="h-16 w-16 text-primary/50" />
+                  <div className="aspect-square bg-muted/30 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                    <img 
+                      src={product.image} 
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
@@ -224,7 +253,7 @@ const Marketplace = () => {
                         {product.originalPrice}
                       </span>
                     </div>
-                    <Button className="shadow-warm">
+                    <Button className="shadow-warm" onClick={() => handleAddToCart(product)}>
                       <ShoppingCart className="h-4 w-4 mr-2" />
                       Add to Cart
                     </Button>
